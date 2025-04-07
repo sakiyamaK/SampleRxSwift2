@@ -352,11 +352,12 @@ class SampleRxSwift8 {
     lazy var outputObservable: Observable<Int> = outputRelay.asObservable()
 
     init() {
+        // ここをBinder(self)にしちゃうとメインスレッドで処理しちゃうので困る場合がある
         inputRelay
-            .map({
-                $0 * 10
+            .subscribe(onNext: {[weak self] value in
+                let newValue = value * 10
+                self!.outputRelay.accept(newValue)
             })
-            .bind(to: outputRelay)
             .disposed(by: disposeBag)
     }
 
