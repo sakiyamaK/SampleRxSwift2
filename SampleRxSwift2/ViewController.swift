@@ -174,8 +174,11 @@ class SampleRxSwift1 {
         behaviorSubject.onError(NSError(domain: "エラー", code: 100))
         behaviorSubject.onCompleted()
         // エラーやonCompletedが流れた後は取得できない
-        let behaviorSubjectValue2 = try? behaviorSubject.value()
-        print("behaviorSubjectが最後に流した値は \(behaviorSubjectValue2 ?? -1)")
+        if let behaviorSubjectValue2 = try? behaviorSubject.value() {
+            print("behaviorSubjectが最後に流した値は \(behaviorSubjectValue2)")
+        } else {
+            print("behaviorSubjectが最後に流した値は取得できなくなったよ")
+        }
 
         // -------- BehaviorRelayに値を流す
         behaviorRelay.accept(1)
@@ -197,6 +200,7 @@ class SampleRxSwift2 {
     let behaviorRelay: BehaviorRelay<Int> = .init(value: 0)
 
     init() {
+        // 本当はここにたくさんのロジックを書いたりする
     }
 }
 
@@ -446,9 +450,16 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-//        testSample1()
+        testSample1()
 //        testSample2()
-        testSample3()
+//        testSample3()
+//        testSample3()
+//        testSample4()
+//        testSample5()
+//        testSample6()
+//        testSample7()
+//        testSample8()
+//        testSample9()
     }
 
     func testSample1() {
@@ -479,6 +490,7 @@ class ViewController: UIViewController {
     func testSample3() {
 
         let sample = SampleRxSwift3()
+        
         sample.outputRelay
             .subscribe(onNext: {
                 print("outputRelay \($0)")
