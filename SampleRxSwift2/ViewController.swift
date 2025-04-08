@@ -68,9 +68,9 @@ class SampleRxSwift1 {
     // 値の受け取りを設定する
     private func setupSubscribe() {
         publishSubject
-            .subscribe(onNext: {
+            .subscribe(onNext: { value in
                 // 値が流れきた時のクロージャ
-                print("publishSubject \($0)")
+                print("publishSubject \(value)")
             }, onError: { error in
                 // エラーが流れきた時のクロージャ
                 print("publishSubject \(error)")
@@ -81,9 +81,9 @@ class SampleRxSwift1 {
             .disposed(by: disposeBag)
 
         publishRelay
-            .subscribe(onNext: {
+            .subscribe(onNext: { value in
                 // 値が流れきた時のクロージャ
-                print("publishRelay \($0)")
+                print("publishRelay \(value)")
             }, onError: { error in
                 /*
                  subscribeメソッドにonErrorのクロージャがあるので指定はできるが
@@ -103,9 +103,9 @@ class SampleRxSwift1 {
             .disposed(by: disposeBag)
 
         behaviorSubject
-            .subscribe(onNext: {
+            .subscribe(onNext: { value in
                 // 値が流れきた時のクロージャ
-                print("behaviorSubject \($0)")
+                print("behaviorSubject \(value)")
             }, onError: { error in
                 // エラーが流れきた時のクロージャ
                 print("behaviorSubject \(error)")
@@ -116,9 +116,9 @@ class SampleRxSwift1 {
             .disposed(by: disposeBag)
 
         behaviorRelay
-            .subscribe(onNext: {
+            .subscribe(onNext: { value in
                 // 値が流れきた時のクロージャ
-                print("behaviorRelay \($0)")
+                print("behaviorRelay \(value)")
             }, onError: { error in
                 /*
                  subscribeメソッドにonErrorのクロージャがあるので指定はできるが
@@ -226,6 +226,7 @@ class SampleRxSwift4 {
     private let outputRelay: PublishRelay<Int> = .init()
 
     // 外部から見えるパラメータは入力と出力で専用の型を使う
+    // 初期化がややこしいが定型文と思えばいい
     lazy var inputObserver: AnyObserver<Int> = .init { [weak self] event in
         // 値が外からきたら何をするか決めるクロージャ
         // ここではinputRelayに渡してる
@@ -261,9 +262,10 @@ class SampleRxSwift5 {
          これまでのsubscribeのクロージャの中で色々とロジックを書いたが宣言的とはいえない
          */
         // bindすると直接流れてきた値をoutputRelayに流す
+        // mapとか色んな便利オペレータでロジックを繋いで最後にbindするというのがリアクティブプログラムっぽい書き方
         inputRelay
-            .map({
-                $0 * 10
+            .map({ value in
+                value * 10
             })
             .bind(to: outputRelay)
             .disposed(by: disposeBag)
@@ -275,7 +277,7 @@ class SampleRxSwift6 {
 
     /*
      パラメータが増えてくると何がinput用で何がoutput用か分からなくなってくる
-     そのためenumやstructやprotocolを利用するなどして、グルーピングしたりする
+     そのためstructやprotocolを利用するなどして、グルーピングしたりする
      */
     struct Input {
         let value: PublishRelay<Int> = .init()
@@ -288,13 +290,9 @@ class SampleRxSwift6 {
     let output: Output = .init()
 
     init() {
-        /*
-         これまでのsubscribeのクロージャの中で色々とロジックを書いたが宣言的とはいえない
-         */
-        // bindすると直接流れてきた値をoutputRelayに流す
         input.value
-            .map({
-                $0 * 10
+            .map({ value in
+                value * 10
             })
             .bind(to: output.value)
             .disposed(by: disposeBag)
@@ -340,9 +338,10 @@ class SampleRxSwift8 {
 
      1. PublishRelayとBehaviorRelayしか使わない
      2. Inputはこれまで通りメソッドを使う
-     3. OutputだけObservableに任せる
+     3. OutputだけObservableに任せる(もしくはOutput用のグルーピングを用意してRelayにする)
      4.
      mapとか色々RxSwiftは便利なメソッドがあるか膨大で機能を把握してられないためやってられない
+     オペレータを繋ぐとログを吐きづらくてデバッグしづらいしブレークポイントも貼れない
      そのためsubscribeでクロージャを使ってロジックを自分で書く
      */
 
@@ -364,6 +363,78 @@ class SampleRxSwift8 {
     func input(value: Int) {
         inputRelay.accept(value)
     }
+}
+
+class SampleRxSwift9 {
+    private let disposeBag = DisposeBag()
+
+    /*
+     おまけ
+     */
+
+    // OutputとしてグルーピングしてるからObservable型にする必要までないでしょうという考え方もアリ
+    struct Output {
+        let valuePublishRelay: PublishRelay<Int> = .init()
+        let valueBehaviorRelay: BehaviorRelay<Int> = .init(value: 0)
+    }
+
+    private let inputPublishRelay1: PublishRelay<Int> = .init()
+    private let inputPublishRelay2: PublishRelay<Int> = .init()
+
+    let output: Output = .init()
+
+    init() {
+        /*
+         ひとつずつ.disposed(by: disposeBag)が面倒だったらこうやって一括登録ができる
+         */
+//        disposeBag.insert {
+//            inputPublishRelay1
+//                .subscribe(onNext: {[weak self] value in
+//                    let newValue = value * 10
+//                    self!.output.valuePublishRelay.accept(newValue)
+//                })
+//
+//            inputPublishRelay2
+//                .subscribe(onNext: {[weak self] value in
+//                    let newValue = value * 100
+//                    self!.output.valueBehaviorRelay.accept(newValue)
+//                })
+//
+//        }
+
+        /*
+         目的に応じて配列でまとめて、配列を最後にdisposeに登録することもできる
+         */
+        let inputDisposable1 = [
+            // 今は1個しかないけど、ここにUser情報に関するsubscribeを入れるとか
+            inputPublishRelay1
+                .subscribe(onNext: {[weak self] value in
+                    let newValue = value * 10
+                    self!.output.valuePublishRelay.accept(newValue)
+                })
+        ]
+        let inputDisposable2: [Disposable] = [
+            // 今は1個しかないけど、こっちには商品情報に関するsubscribeを入れるとか
+            inputPublishRelay2
+                .subscribe(onNext: {[weak self] value in
+                    let newValue = value * 100
+                    self!.output.valueBehaviorRelay.accept(newValue)
+                })
+        ]
+
+        disposeBag.insert(
+            inputDisposable1 + inputDisposable2
+        )
+    }
+
+    func input(value1: Int) {
+        inputPublishRelay1.accept(value1)
+    }
+
+    func input(value2: Int) {
+        inputPublishRelay2.accept(value2)
+    }
+
 }
 
 
@@ -502,7 +573,7 @@ class ViewController: UIViewController {
          })
          とやると
          「メインスレッドになる」し「Binder()で囲った部分は循環参照しなくなる」
-         のでView側でやるならこれが楽だと思う
+         のでView側でやるならこれが楽だと思うが覚えるのがめんどかったら全部subscribeでいいと思う
          */
         sample.output
             .outputObservable
@@ -525,7 +596,29 @@ class ViewController: UIViewController {
         sample.input(value: 2)
     }
 
+    func testSample9() {
+        let sample = SampleRxSwift9()
 
+        disposeBag.insert {
+            sample.output.valuePublishRelay
+                .bind(to: Binder(self) { _self, value in
+                    print("output.valuePublishRelay \(value)")
+                })
+
+            sample.output.valueBehaviorRelay
+                .bind(to: Binder(self) { _self, value in
+                    print("output.valueBehaviorRelay \(value)")
+                })
+        }
+
+        sample.input(value1: 1)
+        sample.input(value2: 2)
+
+
+        // BehaviorRelayは値をいつでも取得できる
+        // Delegateパターンと組み合わせる時に使ったりする
+        print("sample.output.valueBehaviorRelay.value \(sample.output.valueBehaviorRelay.value)")
+    }
 }
 
 #Preview {
