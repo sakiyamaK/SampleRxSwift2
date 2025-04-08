@@ -98,7 +98,6 @@ class SampleRxSwift1 {
                  */
                 // 完了が流れてきた時のクロージャ
                 print("publishRelay completed")
-
             })
             .disposed(by: disposeBag)
 
@@ -286,6 +285,7 @@ class SampleRxSwift6 {
     struct Input {
         let value: PublishRelay<Int> = .init()
     }
+
     struct Output {
         let value: PublishRelay<Int> = .init()
     }
@@ -319,9 +319,13 @@ class SampleRxSwift7 {
     private let inputRelay: PublishRelay<Int> = .init()
     private let outputRelay: PublishRelay<Int> = .init()
 
-    lazy var input: Input = .init(inputObserver: .init(eventHandler: {[weak self] event in
-        self!.inputRelay.accept(event.element!)
-    }))
+    lazy var input: Input = .init(
+        inputObserver: .init(
+            eventHandler: {[weak self] event in
+                self!.inputRelay.accept(event.element!)
+            }
+        )
+    )
     lazy var output: Output = .init(outputObservable: outputRelay.asObservable())
 
     init() {
@@ -417,6 +421,7 @@ class SampleRxSwift9 {
                     self!.output.valuePublishRelay.accept(newValue)
                 })
         ]
+
         let inputDisposable2: [Disposable] = [
             // 今は1個しかないけど、こっちには商品情報に関するsubscribeを入れるとか
             inputPublishRelay2
@@ -441,8 +446,6 @@ class SampleRxSwift9 {
 
 }
 
-
-
 class ViewController: UIViewController {
 
     private let disposeBag = DisposeBag()
@@ -450,9 +453,8 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        testSample1()
+//        testSample1()
 //        testSample2()
-//        testSample3()
 //        testSample3()
 //        testSample4()
 //        testSample5()
@@ -490,7 +492,7 @@ class ViewController: UIViewController {
     func testSample3() {
 
         let sample = SampleRxSwift3()
-        
+
         sample.outputRelay
             .subscribe(onNext: {
                 print("outputRelay \($0)")
@@ -514,7 +516,7 @@ class ViewController: UIViewController {
         let sample = SampleRxSwift4()
 
         sample.outputObservable.subscribe(onNext: {
-            print("outputRelay \($0)")
+            print("outputObservable \($0)")
         }).disposed(by: disposeBag)
 
         // Observableは値を受け取れるが流せない
@@ -534,6 +536,7 @@ class ViewController: UIViewController {
         sample.outputObservable.subscribe(onNext: {
             print("outputRelay \($0)")
         }).disposed(by: disposeBag)
+
         sample.inputObserver.on(.next(1))
         sample.inputObserver.on(.next(2))
     }
@@ -542,7 +545,7 @@ class ViewController: UIViewController {
         let sample = SampleRxSwift6()
 
         sample.output.value.subscribe(onNext: {
-            print("outputRelay \($0)")
+            print("output.value \($0)")
         }).disposed(by: disposeBag)
 
         sample.input.value.accept(1)
@@ -568,8 +571,10 @@ class ViewController: UIViewController {
         sample.output
             .outputObservable
             .subscribe(on: MainScheduler.instance) // これ以降はメインスレッド
-            .subscribe(onNext: {
-                print("outputObservable \($0)")
+            .withUnretained(self)
+            .subscribe(onNext: { `self`, value in
+                print("outputObservable \(value)")
+                self.testSample1()
             }).disposed(by: disposeBag)
 
         sample.input.inputObserver.onNext(1)
@@ -591,6 +596,7 @@ class ViewController: UIViewController {
             .outputObservable
             .bind(to: Binder(self) { _self, value in
                 print("outputObservable \(value)")
+                _self.testSample1()
             }).disposed(by: disposeBag)
 
         sample.input.inputObserver.onNext(1)
