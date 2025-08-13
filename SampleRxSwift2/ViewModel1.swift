@@ -234,7 +234,7 @@ final class ViewModel4 {
 func test4() {
     let disposeBag = DisposeBag()
 
-    let valueRelay = BehaviorRelay<Int>(value: 0)
+//    let valueRelay = BehaviorRelay<Int>(value: 0)
 
     let vm = ViewModel4()
 
@@ -298,7 +298,7 @@ final class ViewModel5 {
 func test5() {
     let disposeBag = DisposeBag()
 
-    let valueRelay = BehaviorRelay<Int>(value: 0)
+//    let valueRelay = BehaviorRelay<Int>(value: 0)
 
     let vm = ViewModel5()
 
@@ -420,9 +420,9 @@ final class ViewModel7 {
 }
 
 func test7() {
-    let disposeBag = DisposeBag()
-
-    let valueRelay = BehaviorRelay<Int>(value: 0)
+//    let disposeBag = DisposeBag()
+//
+//    let valueRelay = BehaviorRelay<Int>(value: 0)
 
     let vm = ViewModel7()
 
