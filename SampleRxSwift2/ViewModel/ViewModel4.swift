@@ -22,6 +22,7 @@ import RxCocoa
 // 外から更新もされないため理想的
 
 final class ViewModel4 {
+
     private let disposeBag = DisposeBag()
     
     private let valueRelay: PublishRelay<Int> = .init()

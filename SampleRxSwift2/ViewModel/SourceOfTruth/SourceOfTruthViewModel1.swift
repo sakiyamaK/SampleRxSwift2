@@ -24,6 +24,7 @@ final class SourceOfTruthViewModel1_1 {
 }
 
 final class SourceOfTruthViewModel1_2 {
+
     private let disposeBag = DisposeBag()
 
     let valueRelay: BehaviorRelay<Int> = .init(value: 0)
@@ -34,8 +35,9 @@ final class SourceOfTruthViewModel1_2 {
 }
 
 func testSourceOfTruthViewModel1() {
+
     let disposeBag = DisposeBag()
-    
+
     let viewModel1_1 = SourceOfTruthViewModel1_1()
     let viewModel1_2 = SourceOfTruthViewModel1_2()
 

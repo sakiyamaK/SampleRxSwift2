@@ -11,6 +11,7 @@ import RxCocoa
 // 信頼できる情報源がひとつの例
 
 final class SourceOfTruthViewModel2_1 {
+    
     private let disposeBag: DisposeBag = .init()
 
     // 情報源はここだけ

@@ -23,6 +23,7 @@ import RxCocoa
 // これならViewModel1と変わらない
 
 final class ViewModel8 {
+    
     private let disposeBag = DisposeBag()
 
     // privateにしてカプセル化している気になっているだけ

@@ -22,6 +22,7 @@ import RxCocoa
 // だが信頼できる情報源をひとつにすることを徹底したら理想系
 
 final class ViewModel1 {
+
     private let disposeBag = DisposeBag()
 
     let valueRelay: BehaviorRelay<Int> = .init(value: 0)

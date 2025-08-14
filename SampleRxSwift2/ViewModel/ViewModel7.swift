@@ -22,6 +22,7 @@ import RxCocoa
 // いわゆるリアクティブじゃない普通のプログラミング
 
 final class ViewModel7 {
+
     private let disposeBag = DisposeBag()
 
     private(set) var value: Int = 0

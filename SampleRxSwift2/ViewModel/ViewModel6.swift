@@ -22,6 +22,7 @@ import RxCocoa
 // 外から受け取った値をリアクティブに何か処理してリアクティブに返すだけ
 
 final class ViewModel6 {
+
     private let disposeBag = DisposeBag()
 
     let outputObservable: Observable<Int>

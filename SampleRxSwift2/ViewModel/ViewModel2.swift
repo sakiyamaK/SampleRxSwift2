@@ -21,7 +21,9 @@ import RxCocoa
 // 値を保持しないため副作用がない
 
 final class ViewModel2 {
+
     private let disposeBag = DisposeBag()
+
     let valueRelay: PublishRelay<Int> = .init()
 
     init() {
