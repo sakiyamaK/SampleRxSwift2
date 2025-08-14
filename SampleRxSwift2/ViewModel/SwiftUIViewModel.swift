@@ -22,6 +22,16 @@ final class SwiftUIViewModel {
     //
     // Observableを使うとSwiftUIでもUIKitでも手続き的に更新すればリアクティブに反応させることができる
     var value: Int = 0
+
+    private func hoge() {
+        // 1. 中からリアクティブに更新 ○
+        // 3. 中から手続き的に更新 ○
+        value = 1
+
+        // 2. 中からリアクティブに値を取得 ○
+        // 4. 中から手続き的に値を取得 ○
+        print(value)
+    }
 }
 
 struct SwiftUIView: View {
@@ -29,8 +39,12 @@ struct SwiftUIView: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            // 6. 外からリアクティブに値を取得 ○
+            // 8. 外から手続き的に値を取得 ○
             Text("\(viewModel.value)")
             Button("Tap Me") {
+                // 5. 外からリアクティブに更新 ○
+                // 7. 外から手続き的に更新 ○
                 self.viewModel.value += 1
             }
         }

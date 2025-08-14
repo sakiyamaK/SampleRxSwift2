@@ -1,30 +1,29 @@
 //
-//  ViewModel2.swift
+//  ViewModel3.swift
 //  SampleRxSwift2
 //
-//  Created by sakiyamaK on 2025/08/13.
+//  Created by sakiyamaK on 2025/08/14.
 //
 
 import RxSwift
 import RxCocoa
 
-// RxSwiftのViewModelの書き方
+// 1. 中からリアクティブに更新 ○
+// 2. 中からリアクティブに値を取得 ○
+// 3. 中から手続き的に更新 ○
+// 4. 中から手続き的に値を取得 ○
+// 5. 外からリアクティブに更新 ○
+// 6. 外からリアクティブに値を取得 ○
+// 7. 外から手続き的に更新 ○
+// 8. 外から手続き的に値を取得 ○
+// 9. 値を保持 ○
+//
+// 最も書く量が多いが、最も安全性が低い
+// ダメな書き方
+// これならViewModel1と変わらない
 
 final class ViewModel8 {
     private let disposeBag = DisposeBag()
-    // 1. 中からリアクティブに更新 ○
-    // 2. 中からリアクティブに値を取得 ○
-    // 3. 中から手続き的に更新 ○
-    // 4. 中から手続き的に値を取得 ○
-    // 5. 外からリアクティブに更新 ○
-    // 6. 外からリアクティブに値を取得 ○
-    // 7. 外から手続き的に更新 ○
-    // 8. 外から手続き的に値を取得 ○
-    // 9. 値を保持 ○
-    //
-    // 最も書く量が少ないが、最も安全性が低い
-    // ダメな書き方
-    // これならViewModel1と変わらない
 
     // privateにしてカプセル化している気になっているだけ
     private let valueRelay: BehaviorRelay<Int> = .init(value: 0)

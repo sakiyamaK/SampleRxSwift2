@@ -6,6 +6,22 @@ SwiftUIのCombineやiOS17からのObservationも双方向バインディング
 
 難しいことを考えずBehaviorRelayかPublishRelayをpublic letで定義してしまうのがSwiftUIへの移行もやりやすいんじゃないか
 
+# 双方向バインディングをするための大前提
+
+Single Source of Truth(信頼できる情報源はひとつ)を徹底すること
+
+Appleも度々そこを強調している
+
+https://developer.apple.com/jp/videos/play/wwdc2020/10040/?time=432
+
+https://developer.apple.com/jp/videos/play/wwdc2019/226/?time=180
+
+言い換えると
+
+`var value: Int`や `let valueRelay: BehaviorRelay<Int>`
+
+をあちこちにコピーするな
+
 # 手続き的な読み書きの必要性
 
 ## 手続き的に値を読み込む必要性
@@ -27,5 +43,6 @@ extension ViewController: UICollectionViewDataSource {
 
 ## 手続き的に値を書き込む必要性
 
-特にないか？
+中途半端にRxSwiftが導入されていて、それ以前の手続き的な処理との橋渡しぐらい
 
+ちゃんと全部がリアクティブになれば必要ないかも？
